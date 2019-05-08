@@ -12,4 +12,23 @@ def getPlaylistTracks():
     playlist_id = uri.split(':')[4]
 
     results = sp.user_playlist(username, playlist_id)
-    return json.dumps(results)
+    output = list(
+        map(mapSpotifyTrack, results['tracks']['items']))
+
+    return json.dumps(output)
+
+
+def mapSpotifyTrack(tracks):
+    track = tracks['track']['name']
+
+    artists = []
+    for artist in tracks['track']['artists']:
+        artists.append(artist['name'])
+
+    image = tracks['track']['album']['images'][0]['url']
+    return {'track': track, 'artists': artists, 'image': image, 'youtube': findYoutubeLink(track, artists)}
+
+
+def findYoutubeLink(track, artist):
+    search = track + ' ' + ' '.join(artist)
+    return search
